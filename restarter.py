@@ -8,9 +8,8 @@ from colorama import init
 init()
 from colorama import Fore, Back, Style
 
-import time
-import datetime
-import sys
+import time, datetime
+import sys, traceback
 
 from notifier import *
 from miner import *
