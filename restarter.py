@@ -88,7 +88,7 @@ def main():
                 print Fore.GREEN + Miner.getDate() + miner.name + " IP: " + miner.ip + " GPIO: " + str(miner.pin) + " is online" + Fore.RESET
             else:
                 if telegramApiKey != "" and telegramChatID != 0:
-                    updater.bot.send_message(chatID, Miner.getDate() + miner.name + " is offline - restart attempt", 0)
+                    updater.bot.send_message(telegramChatID, Miner.getDate() + miner.name + " is offline - restart attempt", 0)
                 print Fore.RED + Miner.getDate() + miner.name + " IP: " + miner.ip + " GPIO: " + str(miner.pin) + " is offline, restart attempt" + Fore.RESET
                 miner.restart()
                 print Fore.YELLOW + Miner.getDate() + miner.name + " IP: " + miner.ip + " GPIO: " + str(miner.pin) + " restarted" + Fore.RESET
