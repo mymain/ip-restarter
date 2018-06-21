@@ -30,7 +30,7 @@ miners = []
 #miners.append(Miner('Miner2', '192.168.1.22', 11)) 
 
 def main():
-    print "Shutdown requested...exiting"
+    try:
         if telegramApiKey != "":
             print Miner.getDate() + "Telegram setup in progress"
             if telegramChatID != 0:
