@@ -3,6 +3,8 @@
 #pip install python-telegram-bot --upgrade
 
 #telegram info https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/bot.py
+#telegram exceptions https://github.com/python-telegram-bot/python-telegram-bot/blob/9e7314134e786eb8589b01d7218991e42acc8c03/examples/echobot.py#L48
+#wiringpi http://wiringpi.com/
 
 from colorama import init
 init()
@@ -10,6 +12,7 @@ from colorama import Fore, Back, Style
 
 import time, datetime
 import sys, traceback
+import telegram
 
 from notifier import *
 from miner import *
@@ -71,7 +74,15 @@ def main():
         print Miner.getDate() + "Lets start!"
 
         if telegramApiKey != "" and telegramChatID != 0:
-            updater.bot.send_message(telegramChatID, Miner.getDate() + "Restarter init - lets start!", 0)
+            try:
+                updater.bot.send_message(telegramChatID, Miner.getDate() + "Restarter init - lets start!", 0)
+            except telegram.TelegramError as e:
+                print Fore.RED + Miner.getDate() + "Telegram messaging exception: " + e.message + Fore.RESET
+                time.sleep(1)
+            except URLError as e:
+                # These are network problems on our end.
+                print Fore.RED + Miner.getDate() + "Telegram messaging exception: " + e.message + Fore.RESET
+                time.sleep(1)
 
         print Miner.getDate() + "Miners to check count: ", len(miners)
         print Miner.getDate() + "Miners check interval: ", check_interval, "seconds"
@@ -87,7 +98,15 @@ def main():
                     print Fore.GREEN + Miner.getDate() + miner.name + " IP: " + miner.ip + " GPIO: " + str(miner.pin) + " is online" + Fore.RESET
                 else:
                     if telegramApiKey != "" and telegramChatID != 0:
-                        updater.bot.send_message(telegramChatID, Miner.getDate() + miner.name + " is offline - restart attempt", 0)
+                        try:
+                            updater.bot.send_message(telegramChatID, Miner.getDate() + miner.name + " is offline - restart attempt", 0)
+                        except telegram.TelegramError as e:
+                            print Fore.RED + Miner.getDate() + "Telegram messaging exception: " + e.message + Fore.RESET
+                            time.sleep(1)
+                        except URLError as e:
+                            # These are network problems on our end.
+                            print Fore.RED + Miner.getDate() + "Telegram messaging exception: " + e.message + Fore.RESET
+                            time.sleep(1)
                     print Fore.RED + Miner.getDate() + miner.name + " IP: " + miner.ip + " GPIO: " + str(miner.pin) + " is offline, restart attempt" + Fore.RESET
                     miner.restart()
                     print Fore.YELLOW + Miner.getDate() + miner.name + " IP: " + miner.ip + " GPIO: " + str(miner.pin) + " restarted" + Fore.RESET
