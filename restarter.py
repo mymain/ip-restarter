@@ -12,38 +12,40 @@ from colorama import Fore, Back, Style
 
 import time, datetime
 import sys, traceback
-import telegram
+import telegram, json
 
 from notifier import *
 from miner import *
 
-check_interval = 300 #seconds
+#check_interval = 300 #seconds
 
 #TelegramBot Setup
-telegramApiKey = ""
+#telegramApiKey = ""
 #how to find chat
 #https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id
 #https://api.telegram.org/bot<telegramApiKey>/getUpdates
-telegramChatID = 0
+#telegramChatID = 0
+
+with open('config.json') as config_file:
+    config = json.load(config_file)
 
 miners = []
 
-#example config
-#miners.append(Miner('Miner1', '192.168.1.11', 10))
-#miners.append(Miner('Miner2', '192.168.1.22', 11)) 
+for miner in config['Miners']:
+    miners.append(Miner(miner['Name'], miner['IP'], miner['GPIO']))
 
 def main():
     try:
-        if telegramApiKey != "":
+        if config['TelegramAPIKey'] != "":
             print Miner.getDate() + "Telegram setup in progress"
-            if telegramChatID != 0:
+            if config['TelegramChatID'] != 0:
                 print Miner.getDate() + "Telegram chat ID is privided"
             else:
                 print Miner.getDate() + "Telegram chat ID is not privided"
             
             #TELEGRAM  INIT
             """Run bot."""
-            updater = Updater(telegramApiKey)
+            updater = Updater(config['TelegramAPIKey'])
 
             # Get the dispatcher to register handlers
             dp = updater.dispatcher
@@ -73,9 +75,9 @@ def main():
         #RESTARTER INIT
         print Miner.getDate() + "Lets start!"
 
-        if telegramApiKey != "" and telegramChatID != 0:
+        if config['TelegramAPIKey'] != "" and config['TelegramChatID'] != 0:
             try:
-                updater.bot.send_message(telegramChatID, Miner.getDate() + "Restarter init - lets start!", 0)
+                updater.bot.send_message(config['TelegramChatID'], Miner.getDate() + "Restarter init - lets start!", 0)
             except telegram.TelegramError as e:
                 print Fore.RED + Miner.getDate() + "Telegram messaging exception: " + e.message + Fore.RESET
                 time.sleep(1)
@@ -85,7 +87,7 @@ def main():
                 time.sleep(1)
 
         print Miner.getDate() + "Miners to check count: ", len(miners)
-        print Miner.getDate() + "Miners check interval: ", check_interval, "seconds"
+        print Miner.getDate() + "Miners check interval: ", config['Interval'], "seconds"
 
         if len(miners) == 0:
             print Miner.getDate() + "Nothing to do - no miners in configuration array exitting."
@@ -97,9 +99,9 @@ def main():
                 if miner.ping() == True:
                     print Fore.GREEN + Miner.getDate() + miner.name + " IP: " + miner.ip + " GPIO: " + str(miner.pin) + " is online" + Fore.RESET
                 else:
-                    if telegramApiKey != "" and telegramChatID != 0:
+                    if config['TelegramAPIKey'] != "" and config['TelegramChatID'] != 0:
                         try:
-                            updater.bot.send_message(telegramChatID, Miner.getDate() + miner.name + " is offline - restart attempt", 0)
+                            updater.bot.send_message(config['TelegramChatID'], Miner.getDate() + miner.name + " is offline - restart attempt", 0)
                         except telegram.TelegramError as e:
                             print Fore.RED + Miner.getDate() + "Telegram messaging exception: " + e.message + Fore.RESET
                             time.sleep(1)
@@ -111,9 +113,9 @@ def main():
                     miner.restart()
                     print Fore.YELLOW + Miner.getDate() + miner.name + " IP: " + miner.ip + " GPIO: " + str(miner.pin) + " restarted" + Fore.RESET
                     
-            print "Starting timer for ", check_interval, "seconds"
+            print "Starting timer for ", config['Interval'], "seconds"
             print "-------------------------------------------"
-            time.sleep(check_interval)
+            time.sleep(config['Interval'])
     except KeyboardInterrupt:
         print "Shutdown requested...exiting"
         updater.stop()

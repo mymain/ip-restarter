@@ -1,0 +1,10 @@
+{
+    "Interval": 300,
+    "TelegramAPIKey": "",
+    "TelegramChatID": 0,
+    "Miners": [
+        {   "Name": "Miner1", "IP": "192.168.1.1", "GPIO": "21"},    
+        {   "Name": "Miner2", "IP": "192.168.1.2", "GPIO": "22"},
+        {   "Name": "Miner3", "IP": "192.168.1.3", "GPIO": "23"}             
+    ]
+}
