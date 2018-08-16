@@ -26,7 +26,9 @@ To exit connected screen session without closing them you should use a combinati
 CTRL+A CTRL+D
 ```
 Because simple CTRL+Z or CTRL+X will close screen session.
-```
+
+### CRON Job Setup
+
 There is also a bash script added by which you should be able to keep all things related to the restarter running all the time enabled in the case of the failure of the application itself or in the case of a system restart/crash. Bash script checks if the screen session is still running, if it does not then run the restarter script again. To perform such a simple monitoring of the restarter application, it is recommended to use CRON by adding an entry like below:
 ```
 * * * * * ~/ip-restarter/cron.sh > /dev/null 2>&1
